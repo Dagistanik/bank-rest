@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <!-- Создание таблицы users -->
+    <changeSet id="001-create-users-table" author="bank-api">
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="role" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Создание таблицы cards -->
+    <changeSet id="002-create-cards-table" author="bank-api">
+        <createTable tableName="cards">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="encrypted_card_number" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="owner_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiry_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="DECIMAL(15,2)" defaultValueNumeric="0.00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Внешний ключ для связи с пользователем -->
+        <addForeignKeyConstraint
+                baseTableName="cards"
+                baseColumnNames="owner_id"
+                constraintName="fk_cards_owner"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Создание таблицы transactions -->
+    <changeSet id="003-create-transactions-table" author="bank-api">
+        <createTable tableName="transactions">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="from_card_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_card_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL(15,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(20)" defaultValue="COMPLETED">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Внешние ключи для связи с картами -->
+        <addForeignKeyConstraint
+                baseTableName="transactions"
+                baseColumnNames="from_card_id"
+                constraintName="fk_transactions_from_card"
+                referencedTableName="cards"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"/>
+
+        <addForeignKeyConstraint
+                baseTableName="transactions"
+                baseColumnNames="to_card_id"
+                constraintName="fk_transactions_to_card"
+                referencedTableName="cards"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"/>
+    </changeSet>
+
+    <!-- Создание индексов для оптимизации запросов -->
+    <changeSet id="004-create-indexes" author="bank-api">
+        <createIndex indexName="idx_cards_owner_id" tableName="cards">
+            <column name="owner_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_cards_status" tableName="cards">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_transactions_from_card" tableName="transactions">
+            <column name="from_card_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_transactions_to_card" tableName="transactions">
+            <column name="to_card_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_transactions_date" tableName="transactions">
+            <column name="transaction_date"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Создание функции для автоматического обновления updated_at -->
+    <changeSet id="005-create-update-timestamp-function" author="bank-api">
+        <sql splitStatements="false">
+            <![CDATA[
+            CREATE OR REPLACE FUNCTION update_updated_at_column()
+            RETURNS TRIGGER AS
+            $$
+            BEGIN
+                NEW.updated_at = CURRENT_TIMESTAMP;
+                RETURN NEW;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            ]]>
+        </sql>
+    </changeSet>
+
+    <!-- Создание триггеров для автоматического обновления updated_at -->
+    <changeSet id="006-create-update-triggers" author="bank-api">
+        <sql>
+            CREATE TRIGGER update_users_updated_at
+                BEFORE UPDATE ON users
+                FOR EACH ROW
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+        <sql>
+            CREATE TRIGGER update_cards_updated_at
+                BEFORE UPDATE ON cards
+                FOR EACH ROW
+                EXECUTE FUNCTION update_updated_at_column();
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,12 @@
+"username": "danik-admin",
+    "email": "danik-admin@bank.com",
+    "password": "admin123"
+
+    token:
+    eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkYW5pay1hZG1pbiIsImlhdCI6MTc1NTI2NDEyNiwiZXhwIjoxNzU1MjY3NzI2fQ.DBtxoDQi6zlj79svAs2v684A6Dnqq_UWGnnXw2AsS3BixQodJARtwlGOBUcursliRH831lQV6PNfR32qOKcofg
+
+    User:
+        eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJpYXQiOjE3NTUyNjU1NzEsImV4cCI6MTc1NTI2OTE3MX0.Xgea4YWo0H0qFWJsaKRTEHTYybTnXu0_bConKDcehGisDt4-XSUSMKTjSwZU2aq6hFj_yKmuALNSvwNbB3cN0A
+
+    Admin:
+        eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbjEiLCJpYXQiOjE3NTUyNjU2MDQsImV4cCI6MTc1NTI2OTIwNH0.7o8TNRJV81LlM6mrtn5CEx_pHrYR7kecpeG1Zuz6qUIKqrhWQ25RDHsNAmLn93MjBWJYQfj17X1bo6yuWDl2tg
