@@ -5,7 +5,7 @@ public class CardNotFoundException extends RuntimeException {
         super(message);
     }
 
-    public CardNotFoundException(Long cardId) {
-        super("Card not found with id: " + cardId);
+    public CardNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

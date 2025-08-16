@@ -5,7 +5,7 @@ public class UnauthorizedCardAccessException extends RuntimeException {
         super(message);
     }
 
-    public UnauthorizedCardAccessException() {
-        super("You can only access your own cards");
+    public UnauthorizedCardAccessException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

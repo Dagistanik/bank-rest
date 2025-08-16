@@ -62,7 +62,7 @@ public class CardService {
     @PreAuthorize("hasRole('ADMIN')")
     public CardResponse blockCard(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException(cardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
         card.setStatus(Card.CardStatus.BLOCKED);
         Card savedCard = cardRepository.save(card);
@@ -72,7 +72,7 @@ public class CardService {
     @PreAuthorize("hasRole('ADMIN')")
     public CardResponse activateCard(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException(cardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
         // Проверяем, не истекла ли карта
         if (card.getExpiryDate().isBefore(LocalDate.now())) {
@@ -87,7 +87,7 @@ public class CardService {
     @PreAuthorize("hasRole('ADMIN')")
     public void deleteCard(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException(cardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
         // Проверяем, что баланс карты равен нулю
         if (card.getBalance().compareTo(BigDecimal.ZERO) != 0) {
@@ -116,10 +116,10 @@ public class CardService {
                 .orElseThrow(() -> new UserNotFoundException("Current user not found"));
 
         Card fromCard = cardRepository.findById(fromCardId)
-                .orElseThrow(() -> new CardNotFoundException(fromCardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + fromCardId));
 
         Card toCard = cardRepository.findById(toCardId)
-                .orElseThrow(() -> new CardNotFoundException(toCardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + toCardId));
 
         // Проверяем, что обе карты принадлежат текущему пользователю
         if (!fromCard.getOwner().getId().equals(currentUser.getId()) ||
@@ -183,7 +183,7 @@ public class CardService {
 
     public CardResponse getCardById(Long cardId) {
         Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException(cardId));
+                .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
         // Проверяем права доступа
         String currentUsername = getCurrentUsername();

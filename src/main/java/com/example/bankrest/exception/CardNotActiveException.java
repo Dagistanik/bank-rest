@@ -5,7 +5,7 @@ public class CardNotActiveException extends RuntimeException {
         super(message);
     }
 
-    public CardNotActiveException(Long cardId) {
-        super("Card with id " + cardId + " is not active");
+    public CardNotActiveException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
