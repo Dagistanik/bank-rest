@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Скрипт для управления банковским приложением в Docker
+# Bank REST API Docker Management Script
 
 set -e
 
@@ -50,8 +50,7 @@ case "$1" in
         echo "  down    - Stop all services"
         echo "  logs    - Show service logs"
         echo "  status  - Show service status"
-        echo "  clean   - Clean up all containers, volumes and images"
+        echo "  clean   - Clean up containers and images"
         echo "  restart - Restart all services"
-        exit 1
         ;;
 esac

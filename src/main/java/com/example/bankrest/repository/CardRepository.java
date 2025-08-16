@@ -19,21 +19,21 @@ public interface CardRepository extends JpaRepository<Card, Long> {
 
     List<Card> findByOwnerId(Long ownerId);
 
-    // Добавляем методы с пагинацией
+    // Add methods with pagination
     Page<Card> findByOwnerId(Long ownerId, Pageable pageable);
 
     Optional<Card> findByEncryptedCardNumber(String encryptedCardNumber);
 
     List<Card> findByStatus(Card.CardStatus status);
 
-    // Добавляем методы с пагинацией для поиска по статусу
+    // Add methods with pagination for status search
     Page<Card> findByStatus(Card.CardStatus status, Pageable pageable);
 
     @Query("SELECT c FROM Card c WHERE c.owner.id = :ownerId AND c.status = :status")
     List<Card> findByOwnerIdAndStatus(@Param("ownerId") Long ownerId, @Param("status") Card.CardStatus status);
 
-    // Добавляем метод с пагинацией для поиска по владельцу и статусу
-    @Query("SELECT c FROM Card c WHERE c.owner.id = :ownerId AND c.status = :status")
+    // Add method with pagination for search by owner and status
+    @Query("SELECT c FROM Card c WHERE c.owner.id = :ownerId AND (:status IS NULL OR c.status = :status)")
     Page<Card> findByOwnerIdAndStatus(@Param("ownerId") Long ownerId, @Param("status") Card.CardStatus status, Pageable pageable);
 
     boolean existsByEncryptedCardNumber(String encryptedCardNumber);

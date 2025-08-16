@@ -20,7 +20,7 @@ public class CardNumberEncryption {
     private static final String TRANSFORMATION = "AES";
 
     private SecretKey getSecretKey() {
-        // Обрезаем или дополняем ключ до 32 байт для AES-256
+        // Trim or pad key to 32 bytes for AES-256
         byte[] key = encryptionKey.getBytes(StandardCharsets.UTF_8);
         byte[] keyBytes = new byte[32];
         System.arraycopy(key, 0, keyBytes, 0, Math.min(key.length, 32));
@@ -59,7 +59,7 @@ public class CardNumberEncryption {
     }
 
     public String generateCardNumber() {
-        // Генерируем номер карты в формате 4XXX-XXXX-XXXX-XXXX
+        // Generate card number in format 4XXX-XXXX-XXXX-XXXX
         StringBuilder cardNumber = new StringBuilder("4"); // Visa starts with 4
 
         for (int i = 1; i < 16; i++) {

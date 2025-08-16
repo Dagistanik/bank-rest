@@ -16,26 +16,26 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/transfer")
-@Tag(name = "Transfers", description = "Переводы между картами")
+@Tag(name = "Transfers", description = "Transfers between cards")
 @SecurityRequirement(name = "bearerAuth")
 public class TransferController {
 
     @Autowired
     private CardService cardService;
 
-    // POST /transfer — перевод между своими картами (только USER)
+    // POST /transfer — transfer between own cards (USER only)
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     @Operation(
-        summary = "Перевод между картами",
-        description = "Перевод средств между собственными картами (только для пользователей)"
+        summary = "Transfer between cards",
+        description = "Transfer funds between own cards (users only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Перевод выполнен успешно",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Transfer completed successfully",
             content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка при выполнении перевода",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Transfer error",
             content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights")
     })
     public ResponseEntity<ApiResponse> transferBetweenOwnCards(@Valid @RequestBody TransferRequest request) {
         try {
@@ -51,7 +51,7 @@ public class TransferController {
         }
     }
 
-    // Вспомогательный класс для ответов API
+    // Helper class for API responses
     public static class ApiResponse {
         private Boolean success;
         private String message;

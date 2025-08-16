@@ -24,25 +24,25 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
-@Tag(name = "Cards", description = "Управление банковскими картами")
+@Tag(name = "Cards", description = "Bank card management")
 @SecurityRequirement(name = "bearerAuth")
 public class CardController {
 
     @Autowired
     private CardService cardService;
 
-    // POST /cards — создание карты (только ADMIN)
+    // POST /cards — create card (ADMIN only)
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Создание новой карты",
-        description = "Создание новой банковской карты (только для администраторов)"
+        summary = "Create new card",
+        description = "Create new bank card (administrators only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Карта успешно создана",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Card created successfully",
             content = @Content(schema = @Schema(implementation = CardResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка валидации"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Validation error"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights")
     })
     public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CreateCardRequest request) {
         try {
@@ -53,24 +53,24 @@ public class CardController {
         }
     }
 
-    // GET /cards — поиск и пагинация (только ADMIN)
+    // GET /cards — search and pagination (ADMIN only)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Получение списка карт с пагинацией",
-        description = "Поиск и пагинация карт с возможностью фильтрации (только для администраторов)"
+        summary = "Get card list with pagination",
+        description = "Search and paginate cards with filtering options (administrators only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Список карт"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of cards"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights")
     })
     public ResponseEntity<Page<CardResponse>> getAllCards(
-            @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "10") int size,
-            @Parameter(description = "Поле для сортировки") @RequestParam(defaultValue = "id") String sortBy,
-            @Parameter(description = "Направление сортировки") @RequestParam(defaultValue = "asc") String sortDir,
-            @Parameter(description = "Фильтр по статусу карты") @RequestParam(required = false) String status,
-            @Parameter(description = "Фильтр по владельцу карты") @RequestParam(required = false) Long ownerId) {
+            @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Sort field") @RequestParam(defaultValue = "id") String sortBy,
+            @Parameter(description = "Sort direction") @RequestParam(defaultValue = "asc") String sortDir,
+            @Parameter(description = "Card status filter") @RequestParam(required = false) String status,
+            @Parameter(description = "Card owner filter") @RequestParam(required = false) Long ownerId) {
         try {
             Sort sort = sortDir.equalsIgnoreCase("desc") ?
                 Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -83,19 +83,19 @@ public class CardController {
         }
     }
 
-    // GET /cards/{id} — просмотр карты
+    // GET /cards/{id} — view card
     @GetMapping("/{id}")
     @Operation(
-        summary = "Получение информации о карте",
-        description = "Просмотр информации о конкретной карте"
+        summary = "Get card information",
+        description = "View information about specific card"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Информация о карте",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Card information",
             content = @Content(schema = @Schema(implementation = CardResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Карта не найдена")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Card not found")
     })
     public ResponseEntity<CardResponse> getCard(
-            @Parameter(description = "ID карты") @PathVariable Long id) {
+            @Parameter(description = "Card ID") @PathVariable Long id) {
         try {
             CardResponse card = cardService.getCardById(id);
             return ResponseEntity.ok(card);
@@ -104,22 +104,22 @@ public class CardController {
         }
     }
 
-    // PUT /cards/{id}/block — блокировка карты (только ADMIN)
+    // PUT /cards/{id}/block — block card (ADMIN only)
     @PutMapping("/{id}/block")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Блокировка карты",
-        description = "Блокировка карты (только для администраторов)"
+        summary = "Block card",
+        description = "Block card (administrators only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Карта успешно заблокирована",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Card blocked successfully",
             content = @Content(schema = @Schema(implementation = CardResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка при блокировке"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Карта не найдена")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Block error"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Card not found")
     })
     public ResponseEntity<CardResponse> blockCard(
-            @Parameter(description = "ID карты") @PathVariable Long id) {
+            @Parameter(description = "Card ID") @PathVariable Long id) {
         try {
             CardResponse cardResponse = cardService.blockCard(id);
             return ResponseEntity.ok(cardResponse);
@@ -128,22 +128,22 @@ public class CardController {
         }
     }
 
-    // PUT /cards/{id}/activate — активация карты (только ADMIN)
+    // PUT /cards/{id}/activate — activate card (ADMIN only)
     @PutMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Активация карты",
-        description = "Активация карты (только для администраторов)"
+        summary = "Activate card",
+        description = "Activate card (administrators only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Карта успешно активирована",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Card activated successfully",
             content = @Content(schema = @Schema(implementation = CardResponse.class))),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка при активации"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Карта не найдена")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Activation error"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Card not found")
     })
     public ResponseEntity<CardResponse> activateCard(
-            @Parameter(description = "ID карты") @PathVariable Long id) {
+            @Parameter(description = "Card ID") @PathVariable Long id) {
         try {
             CardResponse cardResponse = cardService.activateCard(id);
             return ResponseEntity.ok(cardResponse);
@@ -152,21 +152,21 @@ public class CardController {
         }
     }
 
-    // DELETE /cards/{id} — удаление карты (только ADMIN)
+    // DELETE /cards/{id} — delete card (ADMIN only)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
-        summary = "Удаление карты",
-        description = "Удаление карты (только для администраторов)"
+        summary = "Delete card",
+        description = "Delete card (administrators only)"
     )
     @ApiResponses(value = {
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Карта успешно удалена"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка при удалении"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Недостаточно прав доступа"),
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Карта не найдена")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Card deleted successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Delete error"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Card not found")
     })
     public ResponseEntity<Void> deleteCard(
-            @Parameter(description = "ID карты") @PathVariable Long id) {
+            @Parameter(description = "Card ID") @PathVariable Long id) {
         try {
             cardService.deleteCard(id);
             return ResponseEntity.ok().build();
@@ -175,9 +175,17 @@ public class CardController {
         }
     }
 
-    // USER - получение своих карт
+    // USER - get own cards
     @GetMapping("/my")
     @PreAuthorize("hasRole('USER')")
+    @Operation(
+        summary = "Get user's own cards",
+        description = "Get list of cards belonging to current user"
+    )
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "List of user cards"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Insufficient access rights")
+    })
     public ResponseEntity<List<CardResponse>> getMyCards() {
         try {
             List<CardResponse> cards = cardService.getCardsByUser();
@@ -187,7 +195,7 @@ public class CardController {
         }
     }
 
-    // Вспомогательный класс для ответов API
+    // Helper class for API responses
     public static class ApiResponse {
         private Boolean success;
         private String message;

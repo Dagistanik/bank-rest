@@ -52,7 +52,7 @@ public class Card {
     @OneToMany(mappedBy = "toCard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> incomingTransactions;
 
-    // Геттеры
+    // Getters
     public Long getId() {
         return id;
     }
@@ -93,7 +93,7 @@ public class Card {
         return incomingTransactions;
     }
 
-    // Сеттеры
+    // Setters
     public void setId(Long id) {
         this.id = id;
     }

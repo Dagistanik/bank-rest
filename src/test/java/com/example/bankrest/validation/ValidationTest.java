@@ -106,7 +106,7 @@ class ValidationTest {
         SignUpRequest request = new SignUpRequest();
         request.setUsername("testuser");
         request.setEmail("test@example.com");
-        request.setPassword("weak"); // Не соответствует требованиям
+        request.setPassword("weak"); // Does not meet requirements
 
         // Act
         Set<ConstraintViolation<SignUpRequest>> violations = validator.validate(request);

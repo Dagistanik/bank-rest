@@ -40,7 +40,7 @@ public class CardService {
         User owner = userRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new UserNotFoundException(request.getOwnerId()));
 
-        // Генерируем и шифруем номер карты
+        // Generate a random card number
         String cardNumber = cardEncryption.generateCardNumber();
         String encryptedCardNumber = cardEncryption.encrypt(cardNumber);
 

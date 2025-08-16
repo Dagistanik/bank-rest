@@ -19,7 +19,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Bank REST API")
                         .version("1.0.0")
-                        .description("REST API для банковской системы с управлением картами и переводами")
+                        .description("REST API for banking system with card management and transfers")
                         .contact(new Contact()
                                 .name("Bank API Team")
                                 .email("api@bank.com"))

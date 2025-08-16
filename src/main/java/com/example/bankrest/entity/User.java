@@ -46,7 +46,7 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Card> cards;
 
-    // Геттеры
+    // Getters
     public Long getId() {
         return id;
     }
@@ -83,7 +83,7 @@ public class User {
         return cards;
     }
 
-    // Сеттеры
+    // Setters
     public void setId(Long id) {
         this.id = id;
     }

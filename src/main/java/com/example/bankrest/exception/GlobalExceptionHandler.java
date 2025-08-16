@@ -19,9 +19,9 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Обработка ошибок валидации (@Valid)
+    // Handle validation errors (@Valid)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationErrors(
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
@@ -43,10 +43,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Обработка ошибок аутентификации
-    @ExceptionHandler({AuthenticationException.class, BadCredentialsException.class})
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(
-            AuthenticationException ex, HttpServletRequest request) {
+    // Handle authentication errors
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(BadCredentialsException ex, HttpServletRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 "Authentication Failed",
@@ -58,10 +57,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
-    // Обработка ошибок авторизации (доступа)
+    // Handle authorization errors (access)
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
-            AccessDeniedException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 "Access Denied",
@@ -73,9 +71,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
-    // Обработка бизнес-логических ошибок
+    // Handle business logic errors
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
+    public ResponseEntity<ErrorResponse> handleBusinessLogicException(
             RuntimeException ex, HttpServletRequest request) {
 
         HttpStatus status = determineStatusFromMessage(ex.getMessage());
@@ -90,9 +88,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, status);
     }
 
-    // Обработка ошибок "Не найдено"
+    // Handle "Not Found" errors
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
             IllegalArgumentException ex, HttpServletRequest request) {
 
         ErrorResponse errorResponse = new ErrorResponse(
@@ -105,7 +103,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // Обработка всех остальных ошибок
+    // Handle all other errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {
@@ -120,7 +118,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Определение HTTP статуса на основе сообщения об ошибке
+    // Determine HTTP status based on error message
     private HttpStatus determineStatusFromMessage(String message) {
         if (message == null) {
             return HttpStatus.INTERNAL_SERVER_ERROR;
