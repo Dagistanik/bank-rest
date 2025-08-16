@@ -10,6 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - bank-network
     healthcheck:
@@ -18,6 +19,59 @@ services:
       retries: 10
       interval: 10s
       start_period: 40s
+
+  bank-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bank-rest-api
+    environment:
+      # Настройки базы данных для Docker окружения
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank
+      SPRING_DATASOURCE_USERNAME: bank_user
+      SPRING_DATASOURCE_PASSWORD: bank_password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+
+      # JPA/Hibernate настройки
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+
+      # Liquibase настройки
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/migration/changelog-001-init.xml
+      SPRING_LIQUIBASE_ENABLED: true
+      SPRING_LIQUIBASE_DROP_FIRST: false
+
+      # Настройки сервера
+      SERVER_PORT: 8080
+
+      # JWT настройки
+      JWT_SECRET: mySecretKeyForJwtTokenGenerationAndValidationThatIsLongEnoughForHmacSha512Algorithm
+      JWT_EXPIRATION: 3600000
+
+      # Шифрование карт
+      CARD_ENCRYPTION_KEY: myCardEncryptionSecretKey32Bytes!!
+
+      # Swagger/OpenAPI настройки
+      SPRINGDOC_API_DOCS_PATH: /api-docs
+      SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
+      SPRINGDOC_SWAGGER_UI_OPERATIONS_SORTER: method
+      SPRINGDOC_SWAGGER_UI_TAGS_SORTER: alpha
+      SPRINGDOC_SWAGGER_UI_TRY_IT_OUT_ENABLED: true
+      SPRINGDOC_SWAGGER_UI_FILTER: true
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - bank-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   pgadmin:
     image: dpage/pgadmin4
