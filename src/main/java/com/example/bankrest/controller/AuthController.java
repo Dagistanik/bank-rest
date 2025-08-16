@@ -6,6 +6,11 @@ import com.example.bankrest.dto.SignUpRequest;
 import com.example.bankrest.entity.User;
 import com.example.bankrest.repository.UserRepository;
 import com.example.bankrest.util.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Эндпоинты для аутентификации и регистрации пользователей")
 public class AuthController {
 
     @Autowired
@@ -33,6 +39,15 @@ public class AuthController {
     private JwtTokenProvider tokenProvider;
 
     @PostMapping("/login")
+    @Operation(
+        summary = "Аутентификация пользователя",
+        description = "Вход в систему с получением JWT токена"
+    )
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Успешная аутентификация",
+            content = @Content(schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Неверные учетные данные")
+    })
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -63,6 +78,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(
+        summary = "Регистрация нового пользователя",
+        description = "Создание нового пользователя с ролью USER"
+    )
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Успешная регистрация",
+            content = @Content(schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка валидации или пользователь уже существует")
+    })
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest()
@@ -97,6 +121,15 @@ public class AuthController {
     }
 
     @PostMapping("/register-admin")
+    @Operation(
+        summary = "Регистрация администратора",
+        description = "Создание нового пользователя с ролью ADMIN"
+    )
+    @ApiResponses(value = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Успешная регистрация администратора",
+            content = @Content(schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Ошибка валидации или пользователь уже существует")
+    })
     public ResponseEntity<?> registerAdmin(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.badRequest()
