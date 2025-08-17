@@ -15,7 +15,7 @@ public class CardResponse {
     private BigDecimal balance;
     private LocalDateTime createdAt;
 
-    // Конструкторы
+    // Constructors
     public CardResponse() {}
 
     public CardResponse(Long id, String maskedCardNumber, String ownerUsername,
@@ -30,7 +30,7 @@ public class CardResponse {
         this.createdAt = createdAt;
     }
 
-    // Геттеры и сеттеры
+    // Getters and setters
     public Long getId() {
         return id;
     }

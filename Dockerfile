@@ -1,58 +1,58 @@
-# Используем многостадийную сборку для оптимизации размера образа
+# Using multi-stage build to optimize image size
 FROM eclipse-temurin:17-jdk-alpine as build
 
-# Устанавливаем рабочую директорию
+# Setting working directory
 WORKDIR /app
 
-# Копируем Maven wrapper и файлы конфигурации
+# Copy Maven wrapper and configuration files
 COPY mvnw .
 COPY mvnw.cmd .
 COPY pom.xml .
 COPY .mvn .mvn
 
-# Делаем Maven wrapper исполняемым
+# Make Maven wrapper executable
 RUN chmod +x ./mvnw
 
-# Загружаем зависимости (для кеширования слоев)
+# Download dependencies (for layer caching)
 RUN ./mvnw dependency:go-offline -B
 
-# Копируем исходный код
+# Copy source code
 COPY src src
 
-# Собираем приложение
+# Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Производственный образ
+# Production image
 FROM eclipse-temurin:17-jre-alpine
 
-# Устанавливаем curl для health check
+# Install curl for health check
 RUN apk add --no-cache curl
 
-# Создаем пользователя для запуска приложения (безопасность)
+# Create user for running the application (security)
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
-# Устанавливаем рабочую директорию
+# Set working directory
 WORKDIR /app
 
-# Копируем собранный JAR файл из стадии сборки
+# Copy built JAR file from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Изменяем владельца файлов
+# Change file ownership
 RUN chown -R appuser:appgroup /app
 
-# Переключаемся на пользователя приложения
+# Switch to application user
 USER appuser
 
-# Открываем порт 8080
+# Expose port 8080
 EXPOSE 8080
 
-# Настраиваем JVM для контейнера
+# Configure JVM for container
 ENV JAVA_OPTS="-Xmx512m -Xms256m -Djava.security.egd=file:/dev/./urandom"
 
-# Healthcheck для проверки состояния приложения
+# Healthcheck for application status monitoring
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:8080/actuator/health || exit 1
 
-# Команда запуска приложения
+# Application startup command
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

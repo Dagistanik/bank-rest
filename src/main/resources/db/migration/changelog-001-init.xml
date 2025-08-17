@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
-    <!-- Создание таблицы users -->
+    <!-- Creating users table -->
     <changeSet id="001-create-users-table" author="bank-api">
         <createTable tableName="users">
             <column name="id" type="BIGSERIAL">
@@ -35,7 +35,7 @@
         </createTable>
     </changeSet>
 
-    <!-- Создание таблицы cards -->
+    <!-- Creating cards table -->
     <changeSet id="002-create-cards-table" author="bank-api">
         <createTable tableName="cards">
             <column name="id" type="BIGSERIAL">
@@ -64,7 +64,7 @@
             </column>
         </createTable>
 
-        <!-- Внешний ключ для связи с пользователем -->
+        <!-- Foreign key for user relationship -->
         <addForeignKeyConstraint
                 baseTableName="cards"
                 baseColumnNames="owner_id"
@@ -74,7 +74,7 @@
                 onDelete="CASCADE"/>
     </changeSet>
 
-    <!-- Создание таблицы transactions -->
+    <!-- Creating transactions table -->
     <changeSet id="003-create-transactions-table" author="bank-api">
         <createTable tableName="transactions">
             <column name="id" type="BIGSERIAL">
@@ -98,7 +98,7 @@
             </column>
         </createTable>
 
-        <!-- Внешние ключи для связи с картами -->
+        <!-- Foreign keys for card relationships -->
         <addForeignKeyConstraint
                 baseTableName="transactions"
                 baseColumnNames="from_card_id"
@@ -116,7 +116,7 @@
                 onDelete="RESTRICT"/>
     </changeSet>
 
-    <!-- Создание индексов для оптимизации запросов -->
+    <!-- Creating indexes for query optimization -->
     <changeSet id="004-create-indexes" author="bank-api">
         <createIndex indexName="idx_cards_owner_id" tableName="cards">
             <column name="owner_id"/>
@@ -139,7 +139,7 @@
         </createIndex>
     </changeSet>
 
-    <!-- Создание функции для автоматического обновления updated_at -->
+    <!-- Creating function for automatic updated_at updates -->
     <changeSet id="005-create-update-timestamp-function" author="bank-api">
         <sql splitStatements="false">
             <![CDATA[
@@ -156,7 +156,7 @@
         </sql>
     </changeSet>
 
-    <!-- Создание триггеров для автоматического обновления updated_at -->
+    <!-- Creating triggers for automatic updated_at updates -->
     <changeSet id="006-create-update-triggers" author="bank-api">
         <sql>
             CREATE TRIGGER update_users_updated_at

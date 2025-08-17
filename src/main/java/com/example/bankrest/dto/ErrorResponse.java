@@ -27,7 +27,7 @@ public class ErrorResponse {
         this.path = path;
     }
 
-    // Геттеры и сеттеры
+    // Getters and setters
     public String getError() {
         return error;
     }
@@ -76,7 +76,7 @@ public class ErrorResponse {
         this.validationErrors = validationErrors;
     }
 
-    // Вложенный класс для ошибок валидации
+    // Nested class for validation errors
     public static class ValidationError {
         private String field;
         private Object rejectedValue;

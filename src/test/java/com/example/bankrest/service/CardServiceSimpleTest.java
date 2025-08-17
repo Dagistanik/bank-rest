@@ -48,7 +48,7 @@ class CardServiceSimpleTest {
 
     @BeforeEach
     void setUp() {
-        // Настройка тестовых данных
+        // Setup test data
         testUser = new User();
         testUser.setId(1L);
         testUser.setUsername("testuser");
@@ -66,7 +66,7 @@ class CardServiceSimpleTest {
         createCardRequest.setOwnerId(1L);
         createCardRequest.setInitialBalance(BigDecimal.valueOf(500.00));
 
-        // Настройка Security Context
+        // Setup Security Context
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("testuser");

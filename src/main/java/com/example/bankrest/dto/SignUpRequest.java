@@ -23,7 +23,7 @@ public class SignUpRequest {
              message = "Password must contain at least one uppercase letter, one lowercase letter, and one number")
     private String password;
 
-    // Конструкторы
+    // Constructors
     public SignUpRequest() {}
 
     public SignUpRequest(String username, String email, String password) {
@@ -32,7 +32,7 @@ public class SignUpRequest {
         this.password = password;
     }
 
-    // Геттеры
+    // Getters
     public String getUsername() {
         return username;
     }
@@ -45,7 +45,7 @@ public class SignUpRequest {
         return password;
     }
 
-    // Сеттеры
+    // Setters
     public void setUsername(String username) {
         this.username = username;
     }

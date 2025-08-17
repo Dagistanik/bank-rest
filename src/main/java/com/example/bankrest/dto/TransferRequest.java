@@ -23,7 +23,7 @@ public class TransferRequest {
     @Size(max = 255, message = "Description cannot exceed 255 characters")
     private String description;
 
-    // Конструкторы
+    // Constructors
     public TransferRequest() {}
 
     public TransferRequest(Long fromCardId, Long toCardId, BigDecimal amount, String description) {
@@ -33,7 +33,7 @@ public class TransferRequest {
         this.description = description;
     }
 
-    // Геттеры и сеттеры
+    // Getters and setters
     public Long getFromCardId() {
         return fromCardId;
     }

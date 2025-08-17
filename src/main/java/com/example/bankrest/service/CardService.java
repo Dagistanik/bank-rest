@@ -43,8 +43,7 @@ public class CardService {
         // Generate a random card number
         String cardNumber = cardEncryption.generateCardNumber();
         String encryptedCardNumber = cardEncryption.encrypt(cardNumber);
-
-        // Устанавливаем дату истечения по умолчанию (3 года), если не указана
+        // Set default expiry date (3 years) if not specified
         LocalDate expiryDate = request.getExpiryDate() != null ?
                 request.getExpiryDate() : LocalDate.now().plusYears(3);
 
@@ -74,7 +73,7 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
-        // Проверяем, не истекла ли карта
+        // Check if the card has expired
         if (card.getExpiryDate().isBefore(LocalDate.now())) {
             throw new CardNotActiveException("Cannot activate expired card");
         }
@@ -89,7 +88,7 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
-        // Проверяем, что баланс карты равен нулю
+        // Check that the card balance is zero
         if (card.getBalance().compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalArgumentException("Cannot delete card with non-zero balance");
         }
@@ -121,13 +120,13 @@ public class CardService {
         Card toCard = cardRepository.findById(toCardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + toCardId));
 
-        // Проверяем, что обе карты принадлежат текущему пользователю
+        // Check that both cards belong to the current user
         if (!fromCard.getOwner().getId().equals(currentUser.getId()) ||
             !toCard.getOwner().getId().equals(currentUser.getId())) {
             throw new UnauthorizedCardAccessException("You can only transfer between your own cards");
         }
 
-        // Проверяем статус карт
+        // Check the status of the cards
         if (fromCard.getStatus() != Card.CardStatus.ACTIVE) {
             throw new CardNotActiveException("Source card is not active");
         }
@@ -136,17 +135,17 @@ public class CardService {
             throw new CardNotActiveException("Destination card is not active");
         }
 
-        // Проверяем достаточность средств
+        // Check if there are sufficient funds
         if (fromCard.getBalance().compareTo(amount) < 0) {
             throw new InsufficientFundsException();
         }
 
-        // Проверяем, что сумма положительная
+        // Check that the amount is positive
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Transfer amount must be positive");
         }
 
-        // Выполняем перевод
+        // Perform the transfer
         fromCard.setBalance(fromCard.getBalance().subtract(amount));
         toCard.setBalance(toCard.getBalance().add(amount));
 
@@ -155,7 +154,7 @@ public class CardService {
     }
 
     public List<CardResponse> getAllCards() {
-        // Только для админов - получение всех карт в системе
+        // For admins only - get all cards in the system
         List<Card> allCards = cardRepository.findAll();
         return allCards.stream()
                 .map(this::convertToResponse)
@@ -185,12 +184,12 @@ public class CardService {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found with id: " + cardId));
 
-        // Проверяем права доступа
+        // Check access rights
         String currentUsername = getCurrentUsername();
         User currentUser = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new UserNotFoundException("Current user not found"));
 
-        // Админы могут просматривать любые карты, пользователи - только свои
+        // Admins can view any cards, users can only view their own
         if (!currentUser.getRole().equals(User.Role.ADMIN) &&
             !card.getOwner().getId().equals(currentUser.getId())) {
             throw new UnauthorizedCardAccessException("Access denied: You can only view your own cards");
@@ -200,7 +199,7 @@ public class CardService {
     }
 
     private CardResponse convertToResponse(Card card) {
-        // Расшифровываем номер карты для маскирования
+        // Decrypt the card number for masking
         String decryptedCardNumber = cardEncryption.decrypt(card.getEncryptedCardNumber());
         String maskedCardNumber = cardEncryption.maskCardNumber(decryptedCardNumber);
 

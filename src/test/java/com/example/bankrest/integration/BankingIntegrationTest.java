@@ -39,7 +39,7 @@ class BankingIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        // Регистрируем пользователя
+        // Register user
         SignUpRequest userRequest = new SignUpRequest();
         userRequest.setUsername("testuser");
         userRequest.setEmail("user@test.com");
@@ -52,11 +52,11 @@ class BankingIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Извлекаем токен пользователя
+        // Extract user token
         String userResponse = userResult.getResponse().getContentAsString();
         userToken = extractTokenFromResponse(userResponse);
 
-        // Регистрируем администратора
+        // Register administrator
         SignUpRequest adminRequest = new SignUpRequest();
         adminRequest.setUsername("admin");
         adminRequest.setEmail("admin@test.com");
@@ -69,16 +69,16 @@ class BankingIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Извлекаем токен администратора
+        // Extract administrator token
         String adminResponse = adminResult.getResponse().getContentAsString();
         adminToken = extractTokenFromResponse(adminResponse);
     }
 
     @Test
     void fullBankingWorkflow_Success() throws Exception {
-        // 1. Создаем карту как администратор
+        // 1. Create card as administrator
         CreateCardRequest cardRequest = new CreateCardRequest();
-        cardRequest.setOwnerId(1L); // ID пользователя
+        cardRequest.setOwnerId(1L); // User ID
         cardRequest.setInitialBalance(BigDecimal.valueOf(1000.00));
 
         MvcResult cardResult = mockMvc.perform(post("/api/cards")
@@ -90,7 +90,7 @@ class BankingIntegrationTest {
                 .andExpect(jsonPath("$.balance").value(1000.00))
                 .andReturn();
 
-        // 2. Создаем вторую карту
+        // 2. Create second card
         CreateCardRequest secondCardRequest = new CreateCardRequest();
         secondCardRequest.setOwnerId(1L);
         secondCardRequest.setInitialBalance(BigDecimal.valueOf(500.00));
@@ -103,7 +103,7 @@ class BankingIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(500.00));
 
-        // 3. Пользователь делает перевод между своими картами
+        // 3. User makes transfer between their own cards
         TransferRequest transferRequest = new TransferRequest();
         transferRequest.setFromCardId(1L);
         transferRequest.setToCardId(2L);
@@ -117,7 +117,7 @@ class BankingIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true));
 
-        // 4. Проверяем балансы карт
+        // 4. Check card balances
         mockMvc.perform(get("/api/cards/1")
                 .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
@@ -128,14 +128,14 @@ class BankingIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(700.00));
 
-        // 5. Администратор блокирует карту
+        // 5. Administrator blocks card
         mockMvc.perform(put("/api/cards/1/block")
                 .with(csrf())
                 .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("BLOCKED"));
 
-        // 6. Попытка перевода с заблокированной карты должна провалиться
+        // 6. Transfer attempt from blocked card should fail
         mockMvc.perform(post("/api/transfer")
                 .with(csrf())
                 .header("Authorization", "Bearer " + userToken)
@@ -146,7 +146,7 @@ class BankingIntegrationTest {
 
     @Test
     void accessControl_UserCannotAccessAdminEndpoints() throws Exception {
-        // Пользователь не может создавать карты
+        // User cannot create cards
         CreateCardRequest cardRequest = new CreateCardRequest();
         cardRequest.setOwnerId(1L);
         cardRequest.setInitialBalance(BigDecimal.valueOf(1000.00));
@@ -158,12 +158,12 @@ class BankingIntegrationTest {
                 .content(objectMapper.writeValueAsString(cardRequest)))
                 .andExpect(status().isForbidden());
 
-        // Пользователь не может получать список всех карт
+        // User cannot get list of all cards
         mockMvc.perform(get("/api/cards")
                 .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
 
-        // Пользователь не может блокировать карты
+        // User cannot block cards
         mockMvc.perform(put("/api/cards/1/block")
                 .with(csrf())
                 .header("Authorization", "Bearer " + userToken))
@@ -172,7 +172,7 @@ class BankingIntegrationTest {
 
     @Test
     void accessControl_AdminCannotMakeTransfers() throws Exception {
-        // Администратор не может делать переводы
+        // Administrator cannot make transfers
         TransferRequest transferRequest = new TransferRequest();
         transferRequest.setFromCardId(1L);
         transferRequest.setToCardId(2L);
@@ -188,7 +188,7 @@ class BankingIntegrationTest {
 
     @Test
     void authentication_RequiredForProtectedEndpoints() throws Exception {
-        // Без токена доступ запрещен
+        // Access denied without token
         mockMvc.perform(get("/api/cards/1"))
                 .andExpect(status().isUnauthorized());
 
@@ -206,7 +206,7 @@ class BankingIntegrationTest {
     }
 
     private String extractTokenFromResponse(String response) throws Exception {
-        // Парсим JSON ответ и извлекаем токен
+        // Parse JSON response and extract token
         return objectMapper.readTree(response).get("accessToken").asText();
     }
 }

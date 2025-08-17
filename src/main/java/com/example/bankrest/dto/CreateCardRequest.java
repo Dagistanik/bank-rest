@@ -19,7 +19,7 @@ public class CreateCardRequest {
     @DecimalMax(value = "999999.99", message = "Initial balance cannot exceed 999,999.99")
     private BigDecimal initialBalance = BigDecimal.ZERO;
 
-    // Конструкторы
+    // Constructors
     public CreateCardRequest() {}
 
     public CreateCardRequest(Long ownerId, LocalDate expiryDate, BigDecimal initialBalance) {
@@ -28,7 +28,7 @@ public class CreateCardRequest {
         this.initialBalance = initialBalance;
     }
 
-    // Геттеры и сеттеры
+    // Getters and setters
     public Long getOwnerId() {
         return ownerId;
     }

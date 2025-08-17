@@ -63,7 +63,7 @@ class CardServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Настройка тестовых данных
+        // Setup test data
         testUser = new User();
         testUser.setId(1L);
         testUser.setUsername("testuser");
@@ -83,7 +83,7 @@ class CardServiceTest {
         createCardRequest.setOwnerId(1L);
         createCardRequest.setInitialBalance(BigDecimal.valueOf(500.00));
 
-        // Security Context будет настраиваться в конкретных тестах где нужен
+        // Security Context will be configured in specific tests where needed
     }
 
     private void setupSecurityContext() {
@@ -183,7 +183,7 @@ class CardServiceTest {
     @Test
     void transferBetweenOwnCards_Success() {
         // Arrange
-        setupSecurityContext(); // Настраиваем Security Context только для этого теста
+        setupSecurityContext(); // Setup Security Context only for this test
 
         Card fromCard = new Card();
         fromCard.setId(1L);
@@ -215,7 +215,7 @@ class CardServiceTest {
     @Test
     void transferBetweenOwnCards_InsufficientBalance() {
         // Arrange
-        setupSecurityContext(); // Настраиваем Security Context только для этого теста
+        setupSecurityContext(); // Setup Security Context only for this test
 
         Card fromCard = new Card();
         fromCard.setId(1L);
@@ -244,7 +244,7 @@ class CardServiceTest {
     @Test
     void transferBetweenOwnCards_FromCardNotActive() {
         // Arrange
-        setupSecurityContext(); // Настраиваем Security Context только для этого теста
+        setupSecurityContext(); // Setup Security Context only for this test
 
         Card fromCard = new Card();
         fromCard.setId(1L);
@@ -278,7 +278,7 @@ class CardServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         when(cardRepository.findAll(pageable)).thenReturn(cardPage);
-        // Добавляем моки для шифрования, которые нужны в convertToResponse()
+        // Add encryption mocks needed in convertToResponse()
         when(cardEncryption.decrypt("encrypted_1234567890123456")).thenReturn("1234567890123456");
         when(cardEncryption.maskCardNumber("1234567890123456")).thenReturn("****-****-****-3456");
 
@@ -295,7 +295,7 @@ class CardServiceTest {
     @Test
     void getCardById_Success() {
         // Arrange
-        setupSecurityContext(); // Настраиваем Security Context только для этого теста
+        setupSecurityContext(); // Setup Security Context only for this test
 
         when(cardRepository.findById(1L)).thenReturn(Optional.of(testCard));
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
@@ -326,7 +326,7 @@ class CardServiceTest {
     @Test
     void deleteCard_Success() {
         // Arrange
-        testCard.setBalance(BigDecimal.ZERO); // Устанавливаем нулевой баланс для успешного удаления
+        testCard.setBalance(BigDecimal.ZERO); // Set zero balance for successful deletion
         when(cardRepository.findById(1L)).thenReturn(Optional.of(testCard));
 
         // Act

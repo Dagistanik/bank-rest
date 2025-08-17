@@ -51,7 +51,7 @@ class TransferLogicTest {
 
     @BeforeEach
     void setUp() {
-        // Настройка пользователей
+        // Setup users
         testUser = new User();
         testUser.setId(1L);
         testUser.setUsername("testuser");
@@ -62,7 +62,7 @@ class TransferLogicTest {
         anotherUser.setUsername("anotheruser");
         anotherUser.setRole(User.Role.USER);
 
-        // Настройка карт
+        // Setup cards
         fromCard = new Card();
         fromCard.setId(1L);
         fromCard.setEncryptedCardNumber("encrypted_1111111111111111");
@@ -84,7 +84,7 @@ class TransferLogicTest {
         anotherUserCard.setStatus(Card.CardStatus.ACTIVE);
         anotherUserCard.setOwner(anotherUser);
 
-        // Настройка Security Context
+        // Setup Security Context
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("testuser");
@@ -110,7 +110,7 @@ class TransferLogicTest {
     @Test
     void transferBetweenOwnCards_InsufficientBalance_ThrowsException() {
         // Arrange
-        BigDecimal transferAmount = BigDecimal.valueOf(1500.00); // Больше доступного баланса
+        BigDecimal transferAmount = BigDecimal.valueOf(1500.00); // More than available balance
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
@@ -119,7 +119,7 @@ class TransferLogicTest {
         assertThrows(InsufficientFundsException.class,
             () -> cardService.transferBetweenOwnCards(1L, 2L, transferAmount));
 
-        // Баланс не должен измениться
+        // Balance should not change
         assertEquals(BigDecimal.valueOf(1000.00), fromCard.getBalance());
         assertEquals(BigDecimal.valueOf(500.00), toCard.getBalance());
         verify(cardRepository, never()).save(any(Card.class));
@@ -173,7 +173,7 @@ class TransferLogicTest {
         // Arrange
         BigDecimal transferAmount = BigDecimal.valueOf(200.00);
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-        when(cardRepository.findById(3L)).thenReturn(Optional.of(anotherUserCard)); // Карта другого пользователя
+        when(cardRepository.findById(3L)).thenReturn(Optional.of(anotherUserCard)); // Another user's card
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
 
         // Act & Assert
@@ -188,7 +188,7 @@ class TransferLogicTest {
         BigDecimal transferAmount = BigDecimal.valueOf(200.00);
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
-        when(cardRepository.findById(3L)).thenReturn(Optional.of(anotherUserCard)); // Карта другого пользователя
+        when(cardRepository.findById(3L)).thenReturn(Optional.of(anotherUserCard)); // Another user's card
 
         // Act & Assert
         assertThrows(UnauthorizedCardAccessException.class,
@@ -199,7 +199,7 @@ class TransferLogicTest {
     @Test
     void transferBetweenOwnCards_ExactBalance_Success() {
         // Arrange
-        BigDecimal transferAmount = BigDecimal.valueOf(1000.00); // Точно весь баланс
+        BigDecimal transferAmount = BigDecimal.valueOf(1000.00); // Exactly the full balance
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
@@ -219,11 +219,11 @@ class TransferLogicTest {
         BigDecimal transferAmount = BigDecimal.valueOf(200.00);
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
-        // Возвращаем ту же карту для обоих ID
+        // Return the same card for both IDs
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
 
         // Act & Assert
-        // Ожидаем UnauthorizedCardAccessException или другое исключение вместо IllegalArgumentException
+        // Expect UnauthorizedCardAccessException or other exception instead of IllegalArgumentException
         assertThrows(RuntimeException.class,
             () -> cardService.transferBetweenOwnCards(1L, 1L, transferAmount));
         verify(cardRepository, never()).save(any(Card.class));
@@ -234,7 +234,7 @@ class TransferLogicTest {
         // Arrange
         BigDecimal transferAmount = BigDecimal.valueOf(-100.00);
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-        // Добавляем моки для карт, так как метод сначала ищет карты
+        // Add mocks for cards since the method searches for cards first
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
 
@@ -249,7 +249,7 @@ class TransferLogicTest {
         // Arrange
         BigDecimal transferAmount = BigDecimal.ZERO;
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-        // Добавляем моки для карт, так как метод сначала ищет карты
+        // Add mocks for cards since the method searches for cards first
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
 

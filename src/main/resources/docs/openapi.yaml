@@ -1,15 +1,13 @@
 openapi: 3.0.3
 info:
   title: Bank REST API
-  description: REST API для банковской системы с управлением картами и переводами
+  description: REST API for banking system with card management and transfers
   version: 1.0.0
   contact:
     name: Bank API Team
     email: api@bank.com
   license:
     name: MIT License
-    url: https://opensource.org/licenses/MIT
-
 servers:
   - url: http://localhost:8080
     description: Development server
@@ -22,8 +20,8 @@ paths:
     post:
       tags:
         - Authentication
-      summary: Аутентификация пользователя
-      description: Вход в систему с получением JWT токена
+      summary: User authentication
+      description: Login to the system with JWT token retrieval
       security: []
       requestBody:
         required: true
@@ -33,13 +31,13 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Успешная аутентификация
+          description: Successful authentication
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JwtAuthenticationResponse'
         '400':
-          description: Неверные учетные данные
+          description: Invalid credentials
           content:
             application/json:
               schema:
@@ -49,8 +47,8 @@ paths:
     post:
       tags:
         - Authentication
-      summary: Регистрация нового пользователя
-      description: Создание нового пользователя с ролью USER
+      summary: Register new user
+      description: Create new user with USER role
       security: []
       requestBody:
         required: true
@@ -60,13 +58,13 @@ paths:
               $ref: '#/components/schemas/SignUpRequest'
       responses:
         '200':
-          description: Успешная регистрация
+          description: Successful registration
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JwtAuthenticationResponse'
         '400':
-          description: Ошибка валидации или пользователь уже существует
+          description: Validation error or user already exists
           content:
             application/json:
               schema:
@@ -76,8 +74,8 @@ paths:
     post:
       tags:
         - Authentication
-      summary: Регистрация администратора
-      description: Создание нового пользователя с ролью ADMIN
+      summary: Register administrator
+      description: Create new user with ADMIN role
       security: []
       requestBody:
         required: true
@@ -87,13 +85,13 @@ paths:
               $ref: '#/components/schemas/SignUpRequest'
       responses:
         '200':
-          description: Успешная регистрация администратора
+          description: Successful administrator registration
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JwtAuthenticationResponse'
         '400':
-          description: Ошибка валидации или пользователь уже существует
+          description: Validation error or user already exists
           content:
             application/json:
               schema:
@@ -103,8 +101,8 @@ paths:
     post:
       tags:
         - Cards
-      summary: Создание новой карты
-      description: Создание новой карты (только для администраторов)
+      summary: Create new card
+      description: Create new card (administrators only)
       security:
         - bearerAuth: []
       requestBody:
@@ -115,50 +113,50 @@ paths:
               $ref: '#/components/schemas/CreateCardRequest'
       responses:
         '200':
-          description: Карта успешно создана
+          description: Card successfully created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CardResponse'
         '400':
-          description: Ошибка валидации
+          description: Validation error
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
 
     get:
       tags:
         - Cards
-      summary: Получение списка карт с пагинацией
-      description: Поиск и пагинация карт (только для администраторов)
+      summary: Get cards list with pagination
+      description: Search and pagination of cards (administrators only)
       security:
         - bearerAuth: []
       parameters:
         - name: page
           in: query
-          description: Номер страницы
+          description: Page number
           required: false
           schema:
             type: integer
             default: 0
         - name: size
           in: query
-          description: Размер страницы
+          description: Page size
           required: false
           schema:
             type: integer
             default: 10
         - name: sortBy
           in: query
-          description: Поле для сортировки
+          description: Field for sorting
           required: false
           schema:
             type: string
             default: id
         - name: sortDir
           in: query
-          description: Направление сортировки
+          description: Sort direction
           required: false
           schema:
             type: string
@@ -166,155 +164,155 @@ paths:
             default: asc
         - name: status
           in: query
-          description: Фильтр по статусу карты
+          description: Filter by card status
           required: false
           schema:
             type: string
             enum: [ACTIVE, BLOCKED, EXPIRED]
         - name: ownerId
           in: query
-          description: Фильтр по владельцу карты
+          description: Filter by card owner
           required: false
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Список карт
+          description: Cards list
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageCardResponse'
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
 
   /api/cards/{id}:
     get:
       tags:
         - Cards
-      summary: Получение информации о карте
-      description: Просмотр информации о конкретной карте
+      summary: Get card information
+      description: View information about specific card
       security:
         - bearerAuth: []
       parameters:
         - name: id
           in: path
-          description: ID карты
+          description: Card ID
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Информация о карте
+          description: Card information
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CardResponse'
         '404':
-          description: Карта не найдена
+          description: Card not found
         '401':
-          description: Не авторизован
+          description: Unauthorized
 
     delete:
       tags:
         - Cards
-      summary: Удаление карты
-      description: Удаление карты (только для администраторов)
+      summary: Delete card
+      description: Delete card (administrators only)
       security:
         - bearerAuth: []
       parameters:
         - name: id
           in: path
-          description: ID карты
+          description: Card ID
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Карта успешно удалена
+          description: Card successfully deleted
         '400':
-          description: Ошибка при удалении
+          description: Deletion error
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
         '404':
-          description: Карта не найдена
+          description: Card not found
 
   /api/cards/{id}/block:
     put:
       tags:
         - Cards
-      summary: Блокировка карты
-      description: Блокировка карты (только для администраторов)
+      summary: Block card
+      description: Block card (administrators only)
       security:
         - bearerAuth: []
       parameters:
         - name: id
           in: path
-          description: ID карты
+          description: Card ID
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Карта успешно заблокирована
+          description: Card successfully blocked
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CardResponse'
         '400':
-          description: Ошибка при блокировке
+          description: Blocking error
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
         '404':
-          description: Карта не найдена
+          description: Card not found
 
   /api/cards/{id}/activate:
     put:
       tags:
         - Cards
-      summary: Активация карты
-      description: Активация карты (только для администраторов)
+      summary: Activate card
+      description: Activate card (administrators only)
       security:
         - bearerAuth: []
       parameters:
         - name: id
           in: path
-          description: ID карты
+          description: Card ID
           required: true
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Карта успешно активирована
+          description: Card successfully activated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CardResponse'
         '400':
-          description: Ошибка при активации
+          description: Activation error
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
         '404':
-          description: Карта не найдена
+          description: Card not found
 
   /api/transfer:
     post:
       tags:
         - Transfers
-      summary: Перевод между картами
-      description: Перевод средств между собственными картами (только для пользователей)
+      summary: Transfer between cards
+      description: Transfer funds between own cards (users only)
       security:
         - bearerAuth: []
       requestBody:
@@ -325,21 +323,21 @@ paths:
               $ref: '#/components/schemas/TransferRequest'
       responses:
         '200':
-          description: Перевод выполнен успешно
+          description: Transfer completed successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
-          description: Ошибка при выполнении перевода
+          description: Transfer execution error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '401':
-          description: Не авторизован
+          description: Unauthorized
         '403':
-          description: Недостаточно прав доступа
+          description: Insufficient permissions
 
 components:
   securitySchemes:
@@ -357,12 +355,12 @@ components:
       properties:
         username:
           type: string
-          description: Имя пользователя
+          description: Username
           example: "testuser1"
         password:
           type: string
           format: password
-          description: Пароль
+          description: Password
           example: "password123"
 
     SignUpRequest:
@@ -374,17 +372,17 @@ components:
       properties:
         username:
           type: string
-          description: Имя пользователя
+          description: Username
           example: "newuser"
         email:
           type: string
           format: email
-          description: Email адрес
+          description: Email address
           example: "newuser@example.com"
         password:
           type: string
           format: password
-          description: Пароль
+          description: Password
           example: "password123"
 
     JwtAuthenticationResponse:
@@ -392,20 +390,20 @@ components:
       properties:
         accessToken:
           type: string
-          description: JWT токен доступа
+          description: JWT access token
         id:
           type: integer
           format: int64
-          description: ID пользователя
+          description: User ID
         username:
           type: string
-          description: Имя пользователя
+          description: Username
         email:
           type: string
-          description: Email пользователя
+          description: User email
         role:
           type: string
-          description: Роль пользователя
+          description: User role
           enum: [USER, ADMIN]
 
     CreateCardRequest:
@@ -417,12 +415,12 @@ components:
         ownerId:
           type: integer
           format: int64
-          description: ID владельца карты
+          description: Card owner ID
           example: 1
         initialBalance:
           type: number
           format: decimal
-          description: Начальный баланс карты
+          description: Initial card balance
           example: 1000.00
 
     CardResponse:
@@ -431,35 +429,35 @@ components:
         id:
           type: integer
           format: int64
-          description: ID карты
+          description: Card ID
         cardNumber:
           type: string
-          description: Номер карты
+          description: Card number
           example: "1234567890123456"
         balance:
           type: number
           format: decimal
-          description: Баланс карты
+          description: Card balance
           example: 1500.50
         status:
           type: string
-          description: Статус карты
+          description: Card status
           enum: [ACTIVE, BLOCKED, EXPIRED]
         ownerId:
           type: integer
           format: int64
-          description: ID владельца карты
+          description: Card owner ID
         ownerUsername:
           type: string
-          description: Имя владельца карты
+          description: Card owner username
         createdAt:
           type: string
           format: date-time
-          description: Дата создания карты
+          description: Card creation date
         expirationDate:
           type: string
           format: date
-          description: Дата истечения карты
+          description: Card expiration date
 
     TransferRequest:
       type: object
@@ -471,17 +469,17 @@ components:
         fromCardId:
           type: integer
           format: int64
-          description: ID карты отправителя
+          description: Sender card ID
           example: 1
         toCardId:
           type: integer
           format: int64
-          description: ID карты получателя
+          description: Receiver card ID
           example: 2
         amount:
           type: number
           format: decimal
-          description: Сумма перевода
+          description: Transfer amount
           example: 100.00
 
     ApiResponse:
@@ -489,10 +487,10 @@ components:
       properties:
         success:
           type: boolean
-          description: Статус операции
+          description: Operation status
         message:
           type: string
-          description: Сообщение о результате операции
+          description: Result message
 
     PageCardResponse:
       type: object
